@@ -1,0 +1,11 @@
+<launch>
+    <node name="route_converter_node" pkg="route_converter" type="route_converter_node" output="screen">
+        <param name="~sub_map_topic"  value="/map/vector_map" type="str"/>
+        <param name="~sub_route_topic"  value="/planning/mission_planning/route" type="str"/>
+        <param name="~pub_traj_topic"  value="/planning/mission_planning/trajectory" type="str"/>
+        
+        <param name="~lat_origin"  value="324.9855604238188" type="double"/>
+        <param name="~lon_origin"  value="116.88412342557" type="double"/>
+        <param name="~alt_origin"  value="333.167083243839" type="double"/>
+    </node>
+</launch>
