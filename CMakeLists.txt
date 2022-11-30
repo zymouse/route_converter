@@ -49,12 +49,12 @@ target_link_libraries(route_converter
   ${catkin_LIBRARIES}
 )
 
-add_executable(route_converter_node
-  src/route_converter_node.cpp
-)
-target_link_libraries(route_converter_node
-  route_converter
-)
+add_executable(route_converter_node src/route_converter_node.cpp)
+target_link_libraries(route_converter_node route_converter)
+
+
+add_executable(route_converter_test src/route_converter_test.cpp)
+target_link_libraries(route_converter_test route_converter) 
 
 install(TARGETS route_converter_node
   route_converter
