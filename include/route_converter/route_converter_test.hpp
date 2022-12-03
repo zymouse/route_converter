@@ -40,8 +40,11 @@ private:
     lanelet::ConstLanelets all_lanelets_;
     void reSubscriber();
     void onLanelet2Map(autoware_lanelet2_msgs::MapBin msg);
-    void onRoute(const std_msgs::Int8 &msg);
+    void onRoute(const std_msgs::Int8ConstPtr &msg);
     
+
+    lanelet::ConstLanelet m_lanelet;
+
 public:
     route_converter(/* args */);
 };

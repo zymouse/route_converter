@@ -1,9 +1,0 @@
-# 区域ID
-int8 region_id
-# 清扫模式 1-10
-int8 sweeping_mode
-----
-# 下发的mission
-autoware_planning_msgs/Mission current_mission
-# 是否通过ID获取成功
-bool status
