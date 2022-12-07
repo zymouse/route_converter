@@ -472,7 +472,7 @@ namespace route_converter
             {   
                 this->m_mission_msg.free_space_sweeping_mode=autoware_planning_msgs::Mission::CoverageSweeping;
 
-                if(this->m_lineString_obj.attribute(lanelet::AttributeName::Type)=="coverage_path"){
+                if(this->m_lineString_obj.attribute(lanelet::AttributeName::Type)=="coverage_path_end" || this->m_lineString_obj.attribute(lanelet::AttributeName::Type)=="coverage_path_start"){
                     // 如果遍历线开始点
                     if(travelDirection){
                         this->get_lingString_start_points();
@@ -506,7 +506,7 @@ namespace route_converter
             }
             
             
-            // 2.0 泊车线  goal计算
+            // 2.0 泊车线  goal计算 含有width键的都是泊车线段
             if(sweeping_mode==route_converter::GetPlanningGoal_srv::Request::SearchingSweeping|| \
                sweeping_mode==route_converter::GetPlanningGoal_srv::Request::Water || \
                sweeping_mode==route_converter::GetPlanningGoal_srv::Request::Charge || \
