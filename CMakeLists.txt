@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   GetPlanningGoal_srv.srv
+  GetPrimitiveLength_srv.srv
 )
 
 generate_messages(

@@ -1,0 +1,12 @@
+# 问题一：任务进度百分比==车辆行驶的长度积累/规划路径长度
+# 车辆行驶的长度积累: sum_dist = sum_dist + dist(current_pose, last_pose)
+# 规划路径长度 = [lanelet_center]点的距离累加  计算车道的中线线段长度
+# 规划路径长度 = 遍历[coverage_path]线段点的距离累加  计算同一polygon区域下的遍历清扫线所有段总长度
+
+# 输入线段ID 输出polygon-ID
+# 确定点在--lanlet区域, 还是polygon区域
+
+
+int8 areaID   #  输入车道或多边形ID--计算车道长度或多边形里的遍历清扫线段长度
+---
+int32 length # 输出--计算车道长度或多边形里的遍历清扫线段长度 -1 表示计算失败
