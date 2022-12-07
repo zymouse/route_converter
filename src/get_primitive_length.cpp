@@ -71,7 +71,7 @@ namespace route_converter
         this->point_xyz_list_.clear();
         PostPosition xyz;
 
-        this->m_global_lanelet_map_ptr_->laneletLayer
+        this->m_global_lanelet_map_ptr_->lineStringLayer.search()
 
         return true;
     }
