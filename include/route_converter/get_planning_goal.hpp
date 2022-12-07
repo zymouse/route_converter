@@ -16,6 +16,10 @@
 #include "autoware_planning_msgs/Trajectory.h"
 #include "autoware_planning_msgs/TrajectoryPoint.h"
 #include "autoware_lanelet2_msgs/MapBin.h"
+
+#include "std_msgs/Int8.h"
+
+// lanelet API
 #include "lanelet2_extension/utility/message_conversion.h"
 #include "lanelet2_extension/utility/query.h"
 #include "lanelet2_extension/utility/utilities.h"
@@ -49,17 +53,27 @@ class GetPlanningGoal
 private:
     ros::NodeHandle m_nh;
 
-    // pose发布者
+    // ROS publisher
     ros::Publisher pub_mision_;
     geometry_msgs::PoseStamped pub_mision_msg;
 
 
-    // 地图订阅者
+    // ROS sublisher
     std::string m_sub_map_topic_param;                  // 订阅的话题
     ros::Subscriber sub_map_;                           // 订阅地图
     void onLanelet2Map(autoware_lanelet2_msgs::MapBin msg);
     lanelet::LaneletMapPtr m_global_lanelet_map_ptr_;   // 存储地图队对象
     bool is_map_loaded_ = false;                        // 地图对象是否有存在
+
+    /**
+    *  输入lanelet ID 计算车道长度 或者 polygon ID 计算多边形区域遍历清扫长度
+    *  发布者的方式发布出去
+    *  
+    */
+    // std::string sub_primitive_length_topic_;                  // 订阅的话题名称
+    // ros::Subscriber sub_primitive_length_;                    // lanelet原语 遍历线原语长度   
+    // void onGetPrimitiveLength(std_msgs::Int8ConstPtr& msg);
+
 
     // 服务--计算合理的任务点
     std::string m_ser_getMission_topic_param;          // 服务的话题

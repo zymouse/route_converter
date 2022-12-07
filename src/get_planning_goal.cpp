@@ -29,8 +29,9 @@ namespace route_converter
             // init Member variable
             // node params
             {
-            this->m_nh.param<std::string>("/fleet/param/m_sub_map_topic_param", this->m_sub_map_topic_param, "/map/vector_map");
-            this->m_nh.param<std::string>("/fleet/param/m_ser_getMission_topic_param", this->m_ser_getMission_topic_param, "/fleet/service/getMission");
+                this->m_nh.param<std::string>("/fleet/param/m_sub_map_topic_param", this->m_sub_map_topic_param, "/map/vector_map");
+                this->m_nh.param<std::string>("/fleet/param/m_ser_getMission_topic_param", this->m_ser_getMission_topic_param, "/fleet/service/getMission");
+                // this->m_nh.param<std::string>("/fleet/param/sub_primitive_length_topic", this->sub_primitive_length_topic_, "/fleet/topic/primitive_lenght");
             }
             // publisher
             {
@@ -38,12 +39,13 @@ namespace route_converter
             }
             // subscriber
             {
-            this->sub_map_ = this->m_nh.subscribe(this->m_sub_map_topic_param, 1, &GetPlanningGoal::onLanelet2Map, this);
+                this->sub_map_ = this->m_nh.subscribe(this->m_sub_map_topic_param, 1, &GetPlanningGoal::onLanelet2Map, this);
+                // this->sub_primitive_length_ = this->m_nh.subscribe(this->sub_primitive_length_topic_, 1, &GetPlanningGoal::onGetPrimitiveLength, this);
             }
 
             // service 
             {
-            this->m_getMission_server = this->m_nh.advertiseService(this->m_ser_getMission_topic_param, &GetPlanningGoal::onGetMissionMsg, this);
+                this->m_getMission_server = this->m_nh.advertiseService(this->m_ser_getMission_topic_param, &GetPlanningGoal::onGetMissionMsg, this);
             }
 
             sleep(3);
@@ -592,4 +594,9 @@ namespace route_converter
         return true;
         
     }
+
+    // void GetPlanningGoal::onGetPrimitiveLength(std_msgs::Int8ConstPtr& msg)
+    // {
+
+    // }
 }
