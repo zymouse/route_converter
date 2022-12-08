@@ -474,7 +474,7 @@ namespace route_converter
             {   
                 this->m_mission_msg.free_space_sweeping_mode=autoware_planning_msgs::Mission::CoverageSweeping;
 
-                if(this->m_lineString_obj.attribute(lanelet::AttributeName::Type)=="coverage_path_end" || this->m_lineString_obj.attribute(lanelet::AttributeName::Type)=="coverage_path_start"){
+                if(this->m_lineString_obj.attribute(lanelet::AttributeName::Type)=="lane_start" || this->m_lineString_obj.attribute(lanelet::AttributeName::Type)=="lane_end"){
                     // 如果遍历线开始点
                     if(travelDirection){
                         this->get_lingString_start_points();
@@ -494,9 +494,9 @@ namespace route_converter
                         {
                             return -3;
                         }
-                        this->m_mission_msg.goal.position.x = this->point_lineString_end_2.x;
-                        this->m_mission_msg.goal.position.y = this->point_lineString_end_2.y;
-                        this->m_mission_msg.goal.position.z = this->point_lineString_end_2.z;
+                        this->m_mission_msg.goal.position.x = (this->point_lineString_end_2.x + this->point_lineString_end_1.x)/2;
+                        this->m_mission_msg.goal.position.y = (this->point_lineString_end_2.y + this->point_lineString_end_2.y)/2;
+                        this->m_mission_msg.goal.position.z = (this->point_lineString_end_2.z + this->point_lineString_end_2.z/2);
                         return 1;
                     }
                     return 1;
