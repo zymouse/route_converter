@@ -26,6 +26,7 @@
 
 // ros service 
 #include "route_converter/GetPlanningGoal_srv.h"
+#include "route_converter/GetPrimitiveLength_srv.h"
 
 namespace route_converter
 {
@@ -81,6 +82,12 @@ private:
     bool onGetMissionMsg(route_converter::GetPlanningGoal_srv::Request& req,\
                         route_converter::GetPlanningGoal_srv::Response& resp);
     autoware_planning_msgs::Mission m_mission_msg;     // 计算的结果值
+
+    // 计算--车道长度， 遍历清扫长度，指定地点所有lanelet车道长度
+    std::string get_primitive_lenght_topic_name_;
+    ros::ServiceServer get_primitive_lenght_servce_;
+    bool onGetPrimitiveLenght(route_converter::GetPrimitiveLength_srvRequest& req,\
+                              route_converter::GetPrimitiveLength_srvResponse& resp);
 
     // osm 原语对象 
     lanelet::ConstLanelet m_lanelet_obj;               // 车道对象
@@ -190,7 +197,28 @@ private:  // 私有函数 -- 工具函数
      */
     int8_t is_offset_dist_limit(float offset_dist);
 
+private:  // 工具函数 -- 求原语长度
+    std::vector<PostPosition> point_xyz_list_;        // 存储车道居中线所有点xyz 或者 某区域内所有遍历线点xyz 的列表
 
+    bool point_in_polygon(const PostPosition& p , const std::vector<PostPosition> &ptPolygon);
+    
+    /** 
+     * @brief   获取车道居中线所有点
+     * @output  this->point_xyz_list_
+     * 
+     * @param   area_id     车道ID
+     * @return  bool  false 失败 true 成功
+     */
+    bool get_lanlet_centerLane_point_list(int8_t area_id);
+
+    /**
+     * @brief   描述-获取polygon区域的遍历线所有点
+     * @output  this->point_xyz_list_
+     * 
+     * @param   area_id     polygonID
+     * @return  bool        false 失败 true 成功
+     */
+    bool get_coverage_lane_point_list(int8_t area_id);
 public:
     GetPlanningGoal(/* args */);
     ~GetPlanningGoal();

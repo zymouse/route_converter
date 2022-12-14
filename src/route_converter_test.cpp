@@ -55,139 +55,58 @@ void route_converter::onRoute(const std_msgs::Int8ConstPtr &msg)
         return;
     }
 
-
-    if(global_lanelet_map_ptr_->polygonLayer.exists(msg->data)){/*没有处理内容*/}
-
-    if(global_lanelet_map_ptr_->pointLayer.exists(msg->data)){/*暂时没有处理内容*/}
-
-    if(global_lanelet_map_ptr_->laneletLayer.exists(msg->data)){
-        // 取出左边界 中线 右边界 - 开始和结束两个点
-        // lanelet::ConstLanelet temp_lanelet = global_lanelet_map_ptr_->laneletLayer.get(msg->data);
-        this->m_lanelet = global_lanelet_map_ptr_->laneletLayer.get(msg->data);
+    if(global_lanelet_map_ptr_->polygonLayer.exists(msg->data))
+    {
+        auto temp_polygon = global_lanelet_map_ptr_->polygonLayer.get(msg->data);
         
-        auto start_point =  this->m_lanelet.leftBound3d().basicBegin();
-
-        {
-            std::cout << "x=" << start_point->x() << std::endl;
-            std::cout << "y=" << start_point->y() << std::endl;
-            std::cout << "z=" << start_point->z() << std::endl;
-            std::cout << "----------------------" << std::endl;
-        }
-        start_point++;
-        {
-            std::cout << "x=" << start_point->x() << std::endl;
-            std::cout << "y=" << start_point->y() << std::endl;
-            std::cout << "z=" << start_point->z() << std::endl;
-            std::cout << "----------------------" << std::endl;
-        }
+        // auto temp_lineString = global_lanelet_map_ptr_->lineStringLayer.search(lanelet::BoundingBox2d(lanelet::BasicPoint2d(-6.2121, -5.1093), lanelet::BasicPoint2d(19.8427, -26.756)));
         
-        auto end_point =  this->m_lanelet.leftBound3d().basicEnd();
-        end_point--;
-        {
-            std::cout << "x=" << end_point->x() << std::endl;
-            std::cout << "y=" << end_point->y() << std::endl;
-            std::cout << "z=" << end_point->z() << std::endl;
-            std::cout << "----------------------" << std::endl;
-        }
-        end_point--;
-        {
-            std::cout << "x=" << end_point->x() << std::endl;
-            std::cout << "y=" << end_point->y() << std::endl;
-            std::cout << "z=" << end_point->z() << std::endl;
-            std::cout << "----------------------" << std::endl;
-        }
-        // for(auto start_point =  temp_lanelet.leftBound3d().basicBegin(); start_point!=temp_lanelet.leftBound3d().basicEnd(); start_point++)
-        // {
-        //     std::cout << "x=" << start_point->x() << std::endl;
-        //     std::cout << "y=" << start_point->y() << std::endl;
-        //     std::cout << "z=" << start_point->z() << std::endl;
-        //     std::cout << "----------------------" << std::endl;
+        // if(temp_lineString.empty())
+        // {   
+        //     std::cout << "该对象为空" << std::endl;
         // }
 
-        // for(auto start_point =  temp_lanelet.rightBound3d().basicBegin(); start_point!=temp_lanelet.rightBound3d().basicEnd(); start_point++)
+        // for(auto object1=temp_lineString.begin(); object1!=temp_lineString.end();object1)
         // {
-        //     std::cout << "x=" << start_point->x() << std::endl;
-        //     std::cout << "y=" << start_point->y() << std::endl;
-        //     std::cout << "z=" << start_point->z() << std::endl;
-        //     std::cout << "----------------------" << std::endl;
-        // }
-        // for(const auto point:temp_lanelet.leftBound3d().basicLineString()){
             
+        //     std::cout << "id=" << object1->id() << std::endl;
+        // }
+
+        // std::for_each(temp_polygon->, temp_lineString.end(), [&](lanelet::Point3d point)
+        // {
         //     std::cout << "x=" << point.x() << std::endl;
         //     std::cout << "y=" << point.y() << std::endl;
         //     std::cout << "z=" << point.z() << std::endl;
         //     std::cout << "----------------------" << std::endl;
-        // }
+        // });  
         
-        // for(const auto point:temp_lanelet.rightBound3d().basicLineString()){
+        lanelet::Polygon2d  polygon2d_obj;
+        std::for_each(temp_polygon.begin(), temp_polygon.end(), [&](lanelet::Point2d point)
+        {
+            std::cout << "x=" << point.x() << std::endl;
+            std::cout << "y=" << point.y() << std::endl;
+            std::cout << "----------------------" << std::endl;
+            polygon2d_obj.push_back(point);
+        });
+
+
+        auto temp_laneString = global_lanelet_map_ptr_->lineStringLayer.search(lanelet::geometry::boundingBox2d(polygon2d_obj));
+
+        if(temp_laneString.empty())
+        {   
+            std::cout << "该对象为空" << std::endl;
+        }
+
+        for(auto object1=temp_laneString.begin(); object1!=temp_laneString.end(); object1++)
+        {
             
-        //     std::cout << "x=" << point.x() << std::endl;
-        //     std::cout << "y=" << point.y() << std::endl;
-        //     std::cout << "z=" << point.z() << std::endl;
-        //     std::cout << "----------------------" << std::endl;
-        // }
+            std::cout << "id=" << object1->id() << std::endl;
+        }
+
+    }
 
     
-
-        // std::for_each(temp_lanelet.leftBound3d().basicLineString().begin(), temp_lanelet.leftBound3d().basicLineString().end(), [&](lanelet::Point3d point)
-        // {
-        // std::cout << "x=" << point.x() << std::endl;
-        // std::cout << "y=" << point.y() << std::endl;
-        // std::cout << "z=" << point.z() << std::endl;
-        // std::cout << "id=" << point.id() << std::endl;
-        // std::cout << "----------------------" << std::endl;
-        // });
-
-        
-    }
-
-    if(global_lanelet_map_ptr_->lineStringLayer.exists(msg->data)){
-        // 判断特殊线段 -- 获取两个点 -- 出库 入库-倒垃圾 入库--充电注水
-        lanelet::ConstLineString3d temp_lanelet = global_lanelet_map_ptr_->lineStringLayer.get(msg->data);
-        auto start_point =  temp_lanelet.basicBegin();
-        
-        std::cout << "attribute-" << temp_lanelet.attribute(lanelet::AttributeName::Type) << std::endl;
-        std::cout << "attribute-" << temp_lanelet.attribute(lanelet::AttributeName::Subtype) << std::endl;
-        if(temp_lanelet.hasAttribute("width"))
-        {
-            double f1 = temp_lanelet.attribute("width").asDouble().value();
-            std::cout << "attribute-width" << f1  << std::endl;
-        }
-
-        if(temp_lanelet.attribute(lanelet::AttributeName::Type)=="coverage_path"){
-            std::cout << "这是遍历线段" << std::endl;
-        }
-        // {
-        //     std::cout << "x=" << start_point->x() << std::endl;
-        //     std::cout << "y=" << start_point->y() << std::endl;
-        //     std::cout << "z=" << start_point->z() << std::endl;
-        //     std::cout << "----------------------" << std::endl;
-        // }
-        // start_point++;
-        // {
-        //     std::cout << "x=" << start_point->x() << std::endl;
-        //     std::cout << "y=" << start_point->y() << std::endl;
-        //     std::cout << "z=" << start_point->z() << std::endl;
-        //     std::cout << "----------------------" << std::endl;
-        // }
-        
-        // auto end_point =  temp_lanelet.basicEnd();
-        // end_point--;
-        // {
-        //     std::cout << "x=" << end_point->x() << std::endl;
-        //     std::cout << "y=" << end_point->y() << std::endl;
-        //     std::cout << "z=" << end_point->z() << std::endl;
-        //     std::cout << "----------------------" << std::endl;
-        // }
-        // end_point--;
-        // {
-        //     std::cout << "x=" << end_point->x() << std::endl;
-        //     std::cout << "y=" << end_point->y() << std::endl;
-        //     std::cout << "z=" << end_point->z() << std::endl;
-        //     std::cout << "----------------------" << std::endl;
-        // }
-    }
-
+    
     ROS_INFO("lanelet2 ID sub success....");
 }
 

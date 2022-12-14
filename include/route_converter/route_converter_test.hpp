@@ -2,19 +2,28 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
+
 // ros
 #include <ros/ros.h>
 
-// autoware
+// ROS msg 
 #include "autoware_planning_msgs/Route.h"
 #include "autoware_planning_msgs/Trajectory.h"
 #include "autoware_planning_msgs/TrajectoryPoint.h"
 #include "autoware_lanelet2_msgs/MapBin.h"
+#include "std_msgs/Int8.h"
+
+// lanelet2 API
 #include "lanelet2_extension/utility/message_conversion.h"
 #include "lanelet2_extension/utility/query.h"
 #include "lanelet2_extension/utility/utilities.h"
-#include "std_msgs/Int8.h"
-#include <iostream>
+
+#include "lanelet2_core/geometry/Lanelet.h"
+#include "lanelet2_core/geometry/Point.h"
+#include "lanelet2_core/geometry/Polygon.h"
+#include "lanelet2_core/LaneletMap.h"
+
 
 namespace route_converter
 {

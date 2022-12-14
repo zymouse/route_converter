@@ -31,7 +31,8 @@ namespace route_converter
             {
                 this->m_nh.param<std::string>("/fleet/param/m_sub_map_topic_param", this->m_sub_map_topic_param, "/map/vector_map");
                 this->m_nh.param<std::string>("/fleet/param/m_ser_getMission_topic_param", this->m_ser_getMission_topic_param, "/fleet/service/getMission");
-                // this->m_nh.param<std::string>("/fleet/param/sub_primitive_length_topic", this->sub_primitive_length_topic_, "/fleet/topic/primitive_lenght");
+                this->m_nh.param<std::string>("/fleet/param/get_primitive_lenght_topic_name", this->get_primitive_lenght_topic_name_, "/fleet/service/getPrimitiveLenght");
+
             }
             // publisher
             {
@@ -46,6 +47,8 @@ namespace route_converter
             // service 
             {
                 this->m_getMission_server = this->m_nh.advertiseService(this->m_ser_getMission_topic_param, &GetPlanningGoal::onGetMissionMsg, this);
+                this->get_primitive_lenght_servce_ = this->m_nh.advertiseService(this->get_primitive_lenght_topic_name_, &GetPlanningGoal::onGetPrimitiveLenght, this);
+
             }
 
             sleep(3);
@@ -72,6 +75,7 @@ namespace route_converter
         }
 
         float points_dist = hypot(left_point.x-rigth_point.x, left_point.y-rigth_point.y);
+
         // 如果是左右边界
         if(!is_center){
 
@@ -274,7 +278,6 @@ namespace route_converter
     }
 
 
-
     int8_t GetPlanningGoal::from_osm_two_points(int8_t region_id, int8_t sweeping_mode, float offset_dist, bool travelDirection)
     {
         // 如果map地图数据获取成功
@@ -290,6 +293,7 @@ namespace route_converter
             ROS_WARN("该区域号下，清扫模式不存在");
             return 0;
         }
+        
         // ID是否是polygons
         if(this->m_global_lanelet_map_ptr_->polygonLayer.exists(region_id))
         {
@@ -474,7 +478,7 @@ namespace route_converter
             {   
                 this->m_mission_msg.free_space_sweeping_mode=autoware_planning_msgs::Mission::CoverageSweeping;
 
-                if(this->m_lineString_obj.attribute(lanelet::AttributeName::Type)=="lane_start" || this->m_lineString_obj.attribute(lanelet::AttributeName::Type)=="lane_end"){
+                if(this->m_lineString_obj.attribute(lanelet::AttributeName::Type)=="coverage_path_start" || this->m_lineString_obj.attribute(lanelet::AttributeName::Type)=="coverage_path_end"){
                     // 如果遍历线开始点
                     if(travelDirection){
                         this->get_lingString_start_points();
@@ -564,8 +568,82 @@ namespace route_converter
         return -1;
     }
 
+    // ------------求解原语长度----------------------------------------
+    bool GetPlanningGoal::point_in_polygon(const PostPosition &p, const std::vector<PostPosition> &ptPolygon)
+    {
+        int nCount = ptPolygon.size();
+        //  number of cross point
+        int nCross = 0;  
+        for (int i = 0; i < nCount; i++)   
+        {  
+            PostPosition p1 = ptPolygon[i];  
+            PostPosition p2 = ptPolygon[(i + 1) % nCount];
 
+            if ( p1.y == p2.y )  
+                continue;  
+            if ( p.y < std::min(p1.y, p2.y) )  
+                continue;  
+            if ( p.y >= std::max(p1.y, p2.y) )  
+                continue;  
 
+            double x = (p.y - p1.y) * (p2.x - p1.x) / (p2.y - p1.y) + p1.x;  
+
+            if ( x > p.x )  
+            {  
+                nCross++;  
+            }  
+        }  
+        if ((nCross % 2) == 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+
+    }
+
+    bool GetPlanningGoal::get_lanlet_centerLane_point_list(int8_t area_id)
+    {
+        // 获取车道对象
+        if(this->m_global_lanelet_map_ptr_->laneletLayer.exists(area_id))
+        {
+            ROS_WARN("ID为%d的车道lanlet--不存在");
+            return false;
+        }
+        this->point_xyz_list_.clear();
+        PostPosition xyz;
+
+        auto temp_lanelet = this->m_global_lanelet_map_ptr_->laneletLayer.get(area_id);
+        for(const auto point : temp_lanelet.centerline3d().basicLineString())
+        {
+            xyz.x = point.x();
+            xyz.y = point.y();
+            xyz.z = point.z();
+            this->point_xyz_list_.push_back(xyz);
+        }
+        return true;
+    }
+
+    bool GetPlanningGoal::get_coverage_lane_point_list(int8_t area_id)
+    {
+        if(this->m_global_lanelet_map_ptr_->pointLayer.exists(area_id))
+        {
+            ROS_WARN("ID为%d的车道lanlet--不存在");
+            return false;
+        }
+        this->point_xyz_list_.clear();
+        PostPosition xyz;
+
+        auto temp_laneStrings = this->m_global_lanelet_map_ptr_->lineStringLayer.get(area_id);
+        for(auto temp_laneString=temp_laneStrings.begin(); temp_laneString!=temp_laneStrings.end(); temp_laneString++)
+        {
+            // for(){}
+        }
+
+        return true;
+    }
    // --------------------回调函数------------------
     void GetPlanningGoal::onLanelet2Map(autoware_lanelet2_msgs::MapBin msg)
     {
@@ -579,6 +657,40 @@ namespace route_converter
     bool GetPlanningGoal::onGetMissionMsg(route_converter::GetPlanningGoal_srv::Request& req,\
                         route_converter::GetPlanningGoal_srv::Response& resp)
     {
+        if(req.two_point)
+        {
+            resp.status = 1;
+            resp.current_mission.lane_driving_sweeping_mode = autoware_planning_msgs::Mission::LaneDriving;
+            resp.current_mission.free_space_sweeping_mode = autoware_planning_msgs::Mission::Empty;
+            resp.current_mission.mission_order = req.missoin_order;
+
+
+            route_converter::PostPosition start_pose;
+            route_converter::PostPosition end_pose;
+            
+            start_pose.x = req.start_point.x;
+            start_pose.y = req.start_point.y;
+            start_pose.z = req.start_point.z;
+
+            end_pose.x = req.end_point.x;
+            end_pose.y = req.end_point.y;
+            end_pose.z = req.end_point.z;
+
+            this->get_position(start_pose, end_pose, 0, true);
+            resp.current_mission.goal.position.x =  this->m_mission_msg.goal.position.x;
+            resp.current_mission.goal.position.y =  this->m_mission_msg.goal.position.y;
+            resp.current_mission.goal.position.z =  this->m_mission_msg.goal.position.z;
+
+            this->get_orientation(start_pose, end_pose);
+            resp.current_mission.goal.orientation.x = this->m_mission_msg.goal.orientation.x;
+            resp.current_mission.goal.orientation.y = this->m_mission_msg.goal.orientation.y;
+            resp.current_mission.goal.orientation.z = this->m_mission_msg.goal.orientation.z;
+            resp.current_mission.goal.orientation.w = this->m_mission_msg.goal.orientation.w;
+
+            this->pub_mision_.publish(this->pub_mision_msg);
+            return true;
+        }
+
 
         ROS_INFO("服务器收到的区域id: %d", req.region_id);
         int ret = this->from_osm_two_points(req.region_id, req.sweeping_mode, req.offset_dist, req.travelDirection);
@@ -595,8 +707,10 @@ namespace route_converter
         
     }
 
-    // void GetPlanningGoal::onGetPrimitiveLength(std_msgs::Int8ConstPtr& msg)
-    // {
-
-    // }
+    bool GetPlanningGoal::onGetPrimitiveLenght(route_converter::GetPrimitiveLength_srvRequest& req,\
+                              route_converter::GetPrimitiveLength_srvResponse& resp)
+    {
+        
+    }
+   
 }
