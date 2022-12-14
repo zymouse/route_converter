@@ -1,0 +1,31 @@
+# 根据laneletID解算合适的goal
+int8 lanelet_id
+
+uint8 Empty=0
+uint8 LaneDriving=1
+uint8 LaneDrivingWithSweeping=2
+uint8 LaneDrivingWithRightBoundarySweeping=3
+uint8 LaneDrivingWithLeftBoundarySweeping=4
+uint8 CoverageSweeping=5
+uint8 SearchingSweeping=6
+uint8 Water=7
+uint8 Charge=8
+uint8 warehouse=9  
+uint8 DumpingTrash=10
+# 清扫模式 1-10
+int8 sweeping_mode
+
+
+#是否逆行 false 正向行驶 true 逆向行驶
+bool travelDirection
+# 偏移距离 不能大于车道1/2宽
+float32 offset_dist
+# 任务序号
+int8 missoin_order
+
+---
+# 下发的mission
+autoware_planning_msgs/Mission current_mission
+# 获取的状态：0 该区域号下-清扫模式不存在 -1 获取失败区域号不存在 -2 地图没有打开 -3 偏移距离大于车道的1/2宽度 1 获取成功 
+# -4 泊车线 原语 不正确
+int8 status

@@ -31,8 +31,12 @@ namespace route_converter
             {
                 this->m_nh.param<std::string>("/fleet/param/m_sub_map_topic_param", this->m_sub_map_topic_param, "/map/vector_map");
                 this->m_nh.param<std::string>("/fleet/param/m_ser_getMission_topic_param", this->m_ser_getMission_topic_param, "/fleet/service/getMission");
-                this->m_nh.param<std::string>("/fleet/param/get_primitive_lenght_topic_name", this->get_primitive_lenght_topic_name_, "/fleet/service/getPrimitiveLenght");
+                
+                this->m_nh.param<std::string>("/fleet/param/lanelet_goal_servce_topic", this->lanelet_goal_servce_topic_, "/fleet/service/GetlaneletGoal");
+                this->m_nh.param<std::string>("/fleet/param/laneString_goal_servce_topic", this->laneString_goal_servce_topic_, "/fleet/service/GetLaneStringGoal");
+                this->m_nh.param<std::string>("/fleet/param/two_point_goal_servce_topic_", this->two_point_goal_servce_topic_, "/fleet/service/GetTwoPointgoal");
 
+                this->m_nh.param<std::string>("/fleet/param/get_primitive_lenght_topic_name", this->get_primitive_lenght_topic_name_, "/fleet/service/getPrimitiveLenght");
             }
             // publisher
             {
@@ -47,8 +51,12 @@ namespace route_converter
             // service 
             {
                 this->m_getMission_server = this->m_nh.advertiseService(this->m_ser_getMission_topic_param, &GetPlanningGoal::onGetMissionMsg, this);
-                this->get_primitive_lenght_servce_ = this->m_nh.advertiseService(this->get_primitive_lenght_topic_name_, &GetPlanningGoal::onGetPrimitiveLenght, this);
+                
+                this->lanelet_goal_servce_ = this->m_nh.advertiseService(this->lanelet_goal_servce_topic_, &GetPlanningGoal::onServiceLaneletGoal, this);
+                this->laneString_goal_servce_ = this->m_nh.advertiseService(this->laneString_goal_servce_topic_, &GetPlanningGoal::onServiceLaneStringGoal, this);
+                this->two_point_goal_servce_ = this->m_nh.advertiseService(this->two_point_goal_servce_topic_, &GetPlanningGoal::onServiceTwoPointGoal, this);
 
+                this->get_primitive_lenght_servce_ = this->m_nh.advertiseService(this->get_primitive_lenght_topic_name_, &GetPlanningGoal::onGetPrimitiveLenght, this);
             }
 
             sleep(3);
@@ -707,8 +715,8 @@ namespace route_converter
         
     }
 
-    bool GetPlanningGoal::onGetPrimitiveLenght(route_converter::GetPrimitiveLength_srvRequest& req,\
-                              route_converter::GetPrimitiveLength_srvResponse& resp)
+    bool GetPlanningGoal::onGetPrimitiveLenght(route_converter::GetPrimitiveLengthRequest& req,\
+                              route_converter::GetPrimitiveLengthResponse& resp)
     {
         
     }

@@ -1,5 +1,5 @@
-# 区域ID 或者 线段ID
-int8 lanelet_id
+# 根据两点线段--计算合理的goal
+int8 laneString_id
 
 uint8 Empty=0
 uint8 LaneDriving=1
@@ -14,18 +14,12 @@ uint8 warehouse=9
 uint8 DumpingTrash=10
 # 清扫模式 1-10
 int8 sweeping_mode
-
-
-#是否逆行 false 正向行驶 true 逆向行驶  或者 false 到达遍历线段开始点  true 到达遍历线段结束点 或者 false 两点线同向 ture 两点线反向
-bool travelDirection
-# 偏移距离 不能大于车道1/2宽
-float32 offset_dist
 # 任务序号
 int8 missoin_order
 
-# 用于指定地点
-int32 start_id
-int32 end_id
+# true 两点线同向 false 两点线反向
+bool direction
+
 ---
 # 下发的mission
 autoware_planning_msgs/Mission current_mission

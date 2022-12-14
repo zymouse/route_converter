@@ -1,0 +1,6 @@
+
+
+int8 model    # 1：单条lanelet-id长度  2:polygon区域-遍历清扫线长度 3:多条lanlet长度  
+int8 areaID   #  输入车道或多边形ID--计算车道长度或多边形里的遍历清扫线段长度
+---
+int32 length  # 输出--计算车道长度或多边形里的遍历清扫线段长度 -1 表示计算失败

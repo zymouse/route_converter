@@ -26,7 +26,11 @@
 
 // ros service 
 #include "route_converter/GetPlanningGoal_srv.h"
-#include "route_converter/GetPrimitiveLength_srv.h"
+
+#include "route_converter/GetPlanningGoalLanelet.h"
+#include "route_converter/GetPlanningGoalLaneString.h"
+#include "route_converter/GetPlanningGoalTwoPoint.h"
+#include "route_converter/GetPrimitiveLength.h"
 
 namespace route_converter
 {
@@ -66,28 +70,48 @@ private:
     lanelet::LaneletMapPtr m_global_lanelet_map_ptr_;   // 存储地图队对象
     bool is_map_loaded_ = false;                        // 地图对象是否有存在
 
-    /**
-    *  输入lanelet ID 计算车道长度 或者 polygon ID 计算多边形区域遍历清扫长度
-    *  发布者的方式发布出去
-    *  
-    */
-    // std::string sub_primitive_length_topic_;                  // 订阅的话题名称
-    // ros::Subscriber sub_primitive_length_;                    // lanelet原语 遍历线原语长度   
-    // void onGetPrimitiveLength(std_msgs::Int8ConstPtr& msg);
-
+    // ROS SerVice
+    autoware_planning_msgs::Mission m_mission_msg;     // goal计算的结果值
 
     // 服务--计算合理的任务点
     std::string m_ser_getMission_topic_param;          // 服务的话题
     ros::ServiceServer m_getMission_server;            // 服务器
     bool onGetMissionMsg(route_converter::GetPlanningGoal_srv::Request& req,\
                         route_converter::GetPlanningGoal_srv::Response& resp);
-    autoware_planning_msgs::Mission m_mission_msg;     // 计算的结果值
+
+
+    // 解算lanelet区域合理goal
+    std::string lanelet_goal_servce_topic_;
+    ros::ServiceServer lanelet_goal_servce_;
+    bool onServiceLaneletGoal(route_converter::GetPlanningGoalLanelet::Request& req,\
+                              route_converter::GetPlanningGoalLanelet::Response& resp);
+
+
+    // 解算laneString区域合理goal
+    std::string laneString_goal_servce_topic_;
+    ros::ServiceServer laneString_goal_servce_;
+    bool onServiceLaneStringGoal(route_converter::GetPlanningGoalLaneString::Request& req,\
+                                 route_converter::GetPlanningGoalLaneString::Response& resp);
+
+
+    // 解算TwoPoint区域合理goal
+    std::string two_point_goal_servce_topic_;
+    ros::ServiceServer two_point_goal_servce_;
+    bool onServiceTwoPointGoal(route_converter::GetPlanningGoalTwoPoint::Request& req,\
+                               route_converter::GetPlanningGoalTwoPoint::Response& resp);
+
+
 
     // 计算--车道长度， 遍历清扫长度，指定地点所有lanelet车道长度
     std::string get_primitive_lenght_topic_name_;
     ros::ServiceServer get_primitive_lenght_servce_;
-    bool onGetPrimitiveLenght(route_converter::GetPrimitiveLength_srvRequest& req,\
-                              route_converter::GetPrimitiveLength_srvResponse& resp);
+    bool onGetPrimitiveLenght(route_converter::GetPrimitiveLengthRequest& req,\
+                              route_converter::GetPrimitiveLengthResponse& resp);
+
+
+
+
+
 
     // osm 原语对象 
     lanelet::ConstLanelet m_lanelet_obj;               // 车道对象

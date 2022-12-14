@@ -19,7 +19,11 @@ find_package(catkin REQUIRED COMPONENTS
 add_service_files(
   FILES
   GetPlanningGoal_srv.srv
-  GetPrimitiveLength_srv.srv
+
+  GetPlanningGoalLanelet.srv
+  GetPlanningGoalLaneString.srv
+  GetPlanningGoalTwoPoint.srv
+  GetPrimitiveLength.srv
 )
 
 generate_messages(
