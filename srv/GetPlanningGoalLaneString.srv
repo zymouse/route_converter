@@ -19,7 +19,8 @@ int8 missoin_order
 
 # true 两点线同向 false 两点线反向
 bool direction
-
+# 线段里的raw属性
+geometry_msgs/Pose raw
 ---
 # 下发的mission
 autoware_planning_msgs/Mission current_mission
