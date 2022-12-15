@@ -23,6 +23,9 @@ float32 offset_dist
 # 任务序号
 int8 missoin_order
 
+# 线段里的raw属性
+geometry_msgs/Pose raw
+
 # 用于指定地点
 int32 start_id
 int32 end_id
